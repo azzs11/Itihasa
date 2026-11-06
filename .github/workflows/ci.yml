@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg18
+        env:
+          POSTGRES_USER: itihasa
+          POSTGRES_PASSWORD: itihasa
+          POSTGRES_DB: itihasa_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U itihasa"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://itihasa:itihasa@localhost:5432/itihasa_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.13.7"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --frozen --extra dev
+
+      - name: Lint (ruff check)
+        run: uv run ruff check .
+
+      - name: Format check (ruff format)
+        run: uv run ruff format --check .
+
+      - name: Type check (mypy)
+        run: uv run mypy src/
+
+      - name: Test
+        # Exit code 5 means no tests were collected; treat as success until
+        # the first test file is committed.
+        run: |
+          uv run pytest --cov=src/itihasa
+          rc=$?
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 5 ]; then exit "$rc"; fi
