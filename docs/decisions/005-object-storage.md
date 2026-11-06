@@ -1,7 +1,7 @@
 # 005 — Object storage
 
 **Date proposed:** 2026-11-06
-**Status:** Proposed — decision pending
+**Status:** Accepted — 2026-11-06
 
 ## Context
 
@@ -87,7 +87,10 @@ layout (e.g. `objects/ab/cd/<sha256>.bag`) which distributes objects across
 
 ## Decision
 
-> *Owner to record decision and date here.*
+> **Decision:** Filesystem + BagIt packages behind a single `StorageBackend` interface.
+> Revisit SeaweedFS in Phase 4 when public uploads begin.
+>
+> **Date decided:** 2026-11-06
 
 ## Consequences
 

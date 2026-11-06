@@ -1,7 +1,7 @@
 # 007 — Graph store
 
 **Date proposed:** 2026-11-06
-**Status:** Proposed — decision pending
+**Status:** Accepted — 2026-11-06
 
 ## Context
 
@@ -130,7 +130,12 @@ subgraph into igraph for all algorithm runs rather than doing graph traversal in
 
 ## Decision
 
-> *Owner to record decision and date here.*
+> **Decision:** Nodes and edges as tables in PostgreSQL as the single source of truth.
+> Computation with igraph or SciPy sparse — benchmark on the pilot graph before
+> choosing between them. RDF export via Oxigraph when SPARQL queries are needed.
+> No Neo4j.
+>
+> **Date decided:** 2026-11-06
 
 ## Consequences
 

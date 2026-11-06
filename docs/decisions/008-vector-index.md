@@ -1,7 +1,7 @@
 # 008 — Vector index
 
 **Date proposed:** 2026-11-06
-**Status:** Proposed — decision pending
+**Status:** Accepted — 2026-11-06
 
 ## Context
 
@@ -100,13 +100,17 @@ more memory-efficient. Mitigated by planning an IVFPQ fallback in `src/itihasa/r
 
 ## Decision
 
-> *Owner to record decision and date here.*
+> **Decision:** pgvector 0.8.7 in PostgreSQL 18 (confirmed to support PostgreSQL 18;
+> Docker image `pgvector/pgvector:0.8.7-pg18`). FAISS only for offline research
+> experiments when needed.
+>
+> **Date decided:** 2026-11-06
 
 ## Consequences
 
-- `pgvector` is added as a PostgreSQL extension in `docker-compose.yml`
-  (via `pgvector/pgvector` Docker image or as an extension install in the
-  standard PostgreSQL image).
+- `pgvector` 0.8.7 is added as a PostgreSQL 18 extension in `docker-compose.yml`
+  using the `pgvector/pgvector:0.8.7-pg18` Docker image. Pin to this exact tag
+  until an upgrade is explicitly decided.
 - `src/itihasa/retrieve/dense.py` manages the pgvector HNSW index; it also exposes
   a `faiss_index()` function for research experiments that writes a `.faiss` file
   to `results/`.

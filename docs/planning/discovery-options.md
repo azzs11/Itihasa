@@ -161,16 +161,14 @@ Hindi in the benchmark.
 
 ### 4.3 L3Cube-IndicSBERT
 
-**Model:** likely `l3cube-pune/indic-sentence-similarity-sbert` or similar
-(the owner should verify the exact model name on HuggingFace; L3Cube-MumbaiNLP
-maintains multiple IndicSBERT variants)
-**Licence:** MIT (typical for L3Cube models; owner should verify on the model card
-before including in the system)
-**Parameters:** approximately 110–280 M depending on variant (fine-tuned from MuRIL
-or IndicBERT; owner should verify on the model card)
-**Languages:** 10–22 Indic languages depending on the variant
-**Key property:** Indic-specific fine-tuning on sentence similarity tasks in Indian
-languages; smaller and faster than BGE-M3.
+**Model:** `l3cube-pune/indic-sentence-similarity-sbert`
+**Licence:** CC-BY-4.0 (verified on model card)
+**Parameters:** approximately 170 M (BERT-base architecture: 12 layers, hidden size 768,
+Indic vocabulary of 197,285 tokens; derived from published config.json)
+**Languages:** 11 — Hindi, Marathi, Kannada, Tamil, Telugu, Gujarati, Odia, Punjabi,
+Bengali, Malayalam, English (verified on model card; paper: arXiv:2304.11434)
+**Key property:** Indic-specific fine-tuning on sentence similarity across 10 Indian
+languages and English; supports cross-lingual queries; smaller and faster than BGE-M3.
 **Included as:** Indic-specific lightweight alternative.
 
 ### 4.4 all-MiniLM-L6-v2
@@ -257,17 +255,21 @@ stage retrieval) with higher-quality but slower inference.
 stage retriever. Multilingual with strong Indic-language coverage.
 **Feasibility:** ~2.3 GB GPU RAM or ~6–8 GB CPU RAM for inference. Feasible on Colab.
 
-### 7.2 Querit-Reranker-4B
+### 7.2 Qwen3-Reranker-4B
 
-**Model:** verify model card before use (after model's August 2025 knowledge cutoff;
-cited as stated by owner as top public MTEB multilingual reranking score as of Aug 2026)
-**Licence:** owner must verify on the model card before including in the system
-**Parameters:** ~4 B
-**Key property:** Upper bound on reranking quality. At 4B parameters, CPU inference
-is very slow (~minutes per query); feasible only on a Colab A100 or T4 GPU.
-**Included as:** quality ceiling for the reranking ablation, not for production use.
-**Action required:** owner to verify licence, model card, and compute requirements
-before this model is added to any evaluation script.
+**Model:** `Qwen/Qwen3-Reranker-4B`
+**Licence:** Apache-2.0 (verified on model card)
+**Parameters:** 4.02 B (36 transformer layers, Qwen3-4B-Base backbone; verified on
+model card)
+**Context length:** 32,768 tokens
+**Languages:** 100+ including major Indian languages (verified on model card)
+**Requirements:** Hugging Face Transformers ≥ 4.51.0, or vLLM ≥ 0.8.5 for batched
+inference
+**Key property:** Instruction-aware cross-encoder reranker; task-specific instructions
+improve performance 1–5% over defaults. MTEB-R score: 69.76.
+**Included as:** quality ceiling for the reranking ablation. At 4B parameters, CPU
+inference is very slow (minutes per query); feasible only on a Colab A100 or T4 GPU.
+Not for production use.
 
 ### 7.3 mMiniLM cross-encoder (small baseline)
 

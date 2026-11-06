@@ -1,7 +1,7 @@
 # 006 — Search index
 
 **Date proposed:** 2026-11-06
-**Status:** Proposed — decision pending
+**Status:** Accepted — 2026-11-06
 
 ## Context
 
@@ -20,11 +20,10 @@ computed inside OpenSearch are not directly comparable with published TREC/BEIR 
 Conflating the two roles risks publishing numbers that cannot be reproduced from a
 clean environment.
 
-**Note on OpenSearch version:** As of the model's August 2025 knowledge cutoff,
-OpenSearch 2.x (approximately 2.14–2.15) was the current stable series. The current
-date is November 2026; a 3.x release may have been published. The owner must verify
-the current stable major version at opensearch.org before the version is pinned in
-`docker-compose.yml` and `pyproject.toml`.
+**OpenSearch version:** OpenSearch 3.9.0 is the current stable release (released
+29 September 2026). OpenSearch 3.10.0 is scheduled for 3–17 November 2026. Pin the
+newest 3.x patch release listed on opensearch.org at the time of setup. OpenSearch
+is introduced in Phase 2, not Phase 0; it is not in the Phase 0 Docker Compose file.
 
 ## Options
 
@@ -119,7 +118,14 @@ local machine. Document this constraint explicitly when reporting evaluation num
 
 ## Decision
 
-> *Owner to record decision and date here.*
+> **Decision:** OpenSearch 3.x — pin the newest 3.x patch release listed on
+> opensearch.org at the time it is added (3.9.0 is the current stable release,
+> released 29 September 2026; 3.10.0 is scheduled for 3–17 November 2026).
+> OpenSearch is introduced in Phase 2, not Phase 0; it is not in the Phase 0
+> Docker Compose file. Research experiments: Pyserini as the primary toolkit;
+> bm25s as the fallback for JVM-free environments.
+>
+> **Date decided:** 2026-11-06
 
 ## Consequences
 
