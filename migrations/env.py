@@ -17,6 +17,10 @@ target_metadata = Base.metadata
 
 
 def _get_url() -> str:
+    # Respect a URL injected programmatically (e.g. by test fixtures via set_main_option).
+    url = config.get_main_option("sqlalchemy.url")
+    if url:
+        return url
     url = os.environ.get("DATABASE_URL")
     if not url:
         raise RuntimeError(
