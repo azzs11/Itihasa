@@ -38,7 +38,7 @@ not rewriting.
 | Wikipedia (English + Kannada) | CC BY-SA 4.0 | MediaWiki API |
 | Wikimedia Commons | Mixed (CC BY-SA, CC0, PD) | MediaWiki API |
 | Internet Archive | Mixed (per item) | S3-like API or search API |
-| SIDDHAM | Varies (Zenodo records; check per record) | Inscription corpus; check licence on each Zenodo record before ingest |
+| SIDDHAM | Varies (check per Zenodo record) | Inscription corpus. For each Zenodo record, fetch the licence from `metadata.license.id` in the Zenodo API response. Ingest only records with a recognised open licence (store it on the record). Records with a missing, restricted, or unrecognised licence are not ingested; write them to `logs/siddham_skipped.jsonl` with the reason, for owner review. |
 | Pandit | CC BY-NC-SA 4.0 | Sanskrit text repository |
 
 **Later sources** — added only when a richness metric shows a gap, not before:
