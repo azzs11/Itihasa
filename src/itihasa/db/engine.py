@@ -20,8 +20,7 @@ def _get_engine() -> Engine:
         url = os.environ.get("DATABASE_URL")
         if not url:
             raise RuntimeError(
-                "DATABASE_URL is not set. "
-                "Copy .env.example to .env and fill in the values."
+                "DATABASE_URL is not set. Copy .env.example to .env and fill in the values."
             )
         _engine = create_engine(url, pool_pre_ping=True)
     return _engine
