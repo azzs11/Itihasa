@@ -19,7 +19,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 
 def _test_url() -> str:
@@ -62,6 +62,7 @@ def db_engine():
     yield engine
 
     from itihasa.db.models import Base
+
     Base.metadata.drop_all(engine)
     engine.dispose()
 
