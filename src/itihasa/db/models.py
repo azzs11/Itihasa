@@ -51,15 +51,9 @@ class RecordORM(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     checksum: Mapped[str] = mapped_column(String(64), nullable=False)
     # Full source API or SPARQL response before any normalisation.
-    raw_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default="{}"
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    raw_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     current_version_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     versions: Mapped[list["RecordVersionORM"]] = relationship(
@@ -85,21 +79,15 @@ class RecordVersionORM(Base):
     version_number: Mapped[int] = mapped_column(Integer, nullable=False)
     # Full record state at this version, stored as JSONB.
     snapshot: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    superseded_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    superseded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     record: Mapped["RecordORM"] = relationship("RecordORM", back_populates="versions")
     provenance_events: Mapped[list["ProvenanceEventORM"]] = relationship(
         "ProvenanceEventORM", back_populates="version"
     )
 
-    __table_args__ = (
-        UniqueConstraint("record_id", "version_number", name="uq_record_version"),
-    )
+    __table_args__ = (UniqueConstraint("record_id", "version_number", name="uq_record_version"),)
 
 
 class ProvenanceEventORM(Base):
@@ -131,9 +119,7 @@ class ProvenanceEventORM(Base):
     outcome: Mapped[str] = mapped_column(String, nullable=False)
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
 
-    record: Mapped["RecordORM"] = relationship(
-        "RecordORM", back_populates="provenance_events"
-    )
+    record: Mapped["RecordORM"] = relationship("RecordORM", back_populates="provenance_events")
     version: Mapped["RecordVersionORM | None"] = relationship(
         "RecordVersionORM", back_populates="provenance_events"
     )
@@ -146,13 +132,9 @@ class GraphNodeORM(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     node_type: Mapped[str] = mapped_column(String, nullable=False, index=True)
-    wikidata_qid: Mapped[str | None] = mapped_column(
-        String, nullable=True, unique=True, index=True
-    )
+    wikidata_qid: Mapped[str | None] = mapped_column(String, nullable=True, unique=True, index=True)
     label: Mapped[str] = mapped_column(Text, nullable=False)
-    properties: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default="{}"
-    )
+    properties: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default="{}")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     outgoing_edges: Mapped[list["GraphEdgeORM"]] = relationship(
@@ -184,9 +166,7 @@ class GraphEdgeORM(Base):
     relation_type: Mapped[str] = mapped_column(String, nullable=False, index=True)
     weight: Mapped[float] = mapped_column(Float, nullable=False, server_default="1.0")
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
-    properties: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default="{}"
-    )
+    properties: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default="{}")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     source_node: Mapped["GraphNodeORM"] = relationship(
@@ -197,7 +177,5 @@ class GraphEdgeORM(Base):
     )
 
     __table_args__ = (
-        UniqueConstraint(
-            "source_node_id", "target_node_id", "relation_type", name="uq_graph_edge"
-        ),
+        UniqueConstraint("source_node_id", "target_node_id", "relation_type", name="uq_graph_edge"),
     )
