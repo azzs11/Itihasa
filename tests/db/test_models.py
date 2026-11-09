@@ -5,7 +5,7 @@ basic insert/rollback works for each model.  They require a live PostgreSQL
 database and are marked ``db`` accordingly.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -19,7 +19,7 @@ from itihasa.db.models import (
 
 
 def _now() -> datetime:
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 def _record(doc_id: str = "wikidata:Q11739") -> RecordORM:
