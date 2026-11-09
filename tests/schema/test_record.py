@@ -1,6 +1,6 @@
 """Tests for the Record model and all custom field validators."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -20,7 +20,7 @@ def _valid_record(**overrides: object) -> dict[str, object]:
         "language": "hi",
         "script": "Deva",
         "title": "Taj Mahal",
-        "fetched_at": datetime(2026, 11, 6, 12, 0, 0, tzinfo=timezone.utc),
+        "fetched_at": datetime(2026, 11, 6, 12, 0, 0, tzinfo=UTC),
         "checksum": "a" * 64,
     }
     base.update(overrides)
