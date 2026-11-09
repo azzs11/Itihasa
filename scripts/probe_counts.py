@@ -28,9 +28,8 @@ import json
 import os
 import sys
 import time
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
-from urllib.parse import urlencode
 
 import requests
 from dotenv import load_dotenv
@@ -43,13 +42,9 @@ load_dotenv()
 
 CONTACT_EMAIL = os.environ.get("ITIHASA_CONTACT_EMAIL", "")
 if not CONTACT_EMAIL:
-    sys.exit(
-        "ITIHASA_CONTACT_EMAIL is not set. Add it to .env before running probes."
-    )
+    sys.exit("ITIHASA_CONTACT_EMAIL is not set. Add it to .env before running probes.")
 
-USER_AGENT = (
-    f"Itihasa/0.1 (+https://github.com/Akchhya1108/Itihasa; {CONTACT_EMAIL})"
-)
+USER_AGENT = f"Itihasa/0.1 (+https://github.com/Akchhya1108/Itihasa; {CONTACT_EMAIL})"
 ZENODO_API_KEY = os.environ.get("ZENODO_API_KEY", "")
 
 RESULTS_DIR = Path("results") / "probes" / date.today().isoformat()
@@ -66,24 +61,25 @@ KARNATAKA_BBOX = {"south": 11.5, "north": 18.5, "west": 74.0, "east": 78.6}
 # Q9259 (World Heritage Site) is handled via P1435 in the full connector,
 # not via P31, so it is excluded here.
 HERITAGE_INSTANCES = [
-    "Q839954",   # archaeological site
-    "Q16970",    # church building
-    "Q44539",    # temple
-    "Q842402",   # Hindu temple
+    "Q839954",  # archaeological site
+    "Q16970",  # church building
+    "Q44539",  # temple
+    "Q842402",  # Hindu temple
     "Q2613100",  # Jain temple
-    "Q33506",    # museum
+    "Q33506",  # museum
     "Q1785071",  # fort
     "Q4989906",  # monument
     "Q1640824",  # inscription
-    "Q87167",    # manuscript
+    "Q87167",  # manuscript
     "Q1081138",  # historic site
-    "Q16560",    # palace
+    "Q16560",  # palace
 ]
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _session() -> requests.Session:
     s = requests.Session()
@@ -94,7 +90,7 @@ def _session() -> requests.Session:
 def _save(source: str, query: str | dict, count: int | str, notes: str = "") -> None:
     record = {
         "source": source,
-        "probed_at": datetime.now(timezone.utc).isoformat(),
+        "probed_at": datetime.now(UTC).isoformat(),
         "query": query,
         "count": count,
         "notes": notes,
@@ -108,7 +104,7 @@ def _save(source: str, query: str | dict, count: int | str, notes: str = "") -> 
 def _save_error(source: str, error: str) -> None:
     record = {
         "source": source,
-        "probed_at": datetime.now(timezone.utc).isoformat(),
+        "probed_at": datetime.now(UTC).isoformat(),
         "count": "ERROR",
         "error": error,
     }
@@ -117,8 +113,9 @@ def _save_error(source: str, error: str) -> None:
     print(f"  {source:<30} ERROR: {error}")
 
 
-def _get(session: requests.Session, url: str, params: dict | None = None,
-         headers: dict | None = None) -> requests.Response:
+def _get(
+    session: requests.Session, url: str, params: dict | None = None, headers: dict | None = None
+) -> requests.Response:
     r = session.get(url, params=params, headers=headers, timeout=60)
     r.raise_for_status()
     time.sleep(1)  # polite pause between requests
@@ -223,10 +220,10 @@ WP_EN_SEEDS = [
 ]
 
 WP_KN_SEEDS = [
-    "ಕರ್ನಾಟಕದ ಪರಂಪರೆ ತಾಣಗಳು",   # Heritage sites in Karnataka
-    "ಕರ್ನಾಟಕದ ದೇವಾಲಯಗಳು",          # Temples in Karnataka
-    "ಕರ್ನಾಟಕದ ಇತಿಹಾಸ",              # History of Karnataka
-    "ಕನ್ನಡ ಸಾಹಿತ್ಯ",                 # Kannada literature
+    "ಕರ್ನಾಟಕದ ಪರಂಪರೆ ತಾಣಗಳು",  # Heritage sites in Karnataka
+    "ಕರ್ನಾಟಕದ ದೇವಾಲಯಗಳು",  # Temples in Karnataka
+    "ಕರ್ನಾಟಕದ ಇತಿಹಾಸ",  # History of Karnataka
+    "ಕನ್ನಡ ಸಾಹಿತ್ಯ",  # Kannada literature
 ]
 
 COMMONS_SEEDS = [
@@ -240,12 +237,16 @@ COMMONS_SEEDS = [
 
 def _mw_category_size(session: requests.Session, api: str, category: str) -> int:
     """Return the categoryinfo size for one category (pages + files + subcats)."""
-    r = _get(session, api, params={
-        "action": "query",
-        "titles": f"Category:{category}",
-        "prop": "categoryinfo",
-        "format": "json",
-    })
+    r = _get(
+        session,
+        api,
+        params={
+            "action": "query",
+            "titles": f"Category:{category}",
+            "prop": "categoryinfo",
+            "format": "json",
+        },
+    )
     pages = r.json().get("query", {}).get("pages", {})
     for page in pages.values():
         ci = page.get("categoryinfo", {})
@@ -253,18 +254,20 @@ def _mw_category_size(session: requests.Session, api: str, category: str) -> int
     return 0
 
 
-def _probe_mediawiki(session: requests.Session, source: str, api: str,
-                     seeds: list[str]) -> None:
+def _probe_mediawiki(session: requests.Session, source: str, api: str, seeds: list[str]) -> None:
     total = 0
     per_cat: dict[str, int] = {}
     for cat in seeds:
         n = _mw_category_size(session, api, cat)
         per_cat[cat] = n
         total += n
-    _save(source, {"api": api, "seed_categories": seeds,
-                   "per_category": per_cat}, total,
-          notes="Sum of direct category members across seed categories; "
-                "subcategories not yet traversed.")
+    _save(
+        source,
+        {"api": api, "seed_categories": seeds, "per_category": per_cat},
+        total,
+        notes="Sum of direct category members across seed categories; "
+        "subcategories not yet traversed.",
+    )
 
 
 def probe_mediawiki(session: requests.Session) -> None:
@@ -288,13 +291,9 @@ IA_SEARCH = "https://archive.org/advancedsearch.php"
 
 IA_QUERIES = {
     "texts": (
-        "(language:(Kannada) OR language:(kan) OR subject:(Karnataka)) "
-        "AND mediatype:(texts)"
+        "(language:(Kannada) OR language:(kan) OR subject:(Karnataka)) AND mediatype:(texts)"
     ),
-    "images": (
-        "(language:(Kannada) OR subject:(Karnataka heritage)) "
-        "AND mediatype:(image)"
-    ),
+    "images": ("(language:(Kannada) OR subject:(Karnataka heritage)) AND mediatype:(image)"),
 }
 
 
@@ -304,17 +303,25 @@ def probe_internet_archive(session: requests.Session) -> None:
         total = 0
         per_query: dict[str, int] = {}
         for label, q in IA_QUERIES.items():
-            r = _get(session, IA_SEARCH, params={
-                "q": q,
-                "rows": 0,
-                "output": "json",
-            })
+            r = _get(
+                session,
+                IA_SEARCH,
+                params={
+                    "q": q,
+                    "rows": 0,
+                    "output": "json",
+                },
+            )
             n = r.json()["response"]["numFound"]
             per_query[label] = n
             total += n
-        _save("internet_archive", {"queries": IA_QUERIES}, total,
-              notes="numFound from IA Lucene search; texts + images combined. "
-                    "Will be narrowed by heritage subject filter in connector.")
+        _save(
+            "internet_archive",
+            {"queries": IA_QUERIES},
+            total,
+            notes="numFound from IA Lucene search; texts + images combined. "
+            "Will be narrowed by heritage subject filter in connector.",
+        )
     except Exception as exc:
         _save_error("internet_archive", str(exc))
 
@@ -338,19 +345,29 @@ def probe_siddham(session: requests.Session) -> None:
         if ZENODO_API_KEY:
             headers["Authorization"] = f"Bearer {ZENODO_API_KEY}"
 
-        r_all = _get(session, ZENODO_SEARCH, params={
-            "communities": SIDDHAM_COMMUNITY,
-            "size": 1,
-            "page": 1,
-        }, headers=headers)
+        r_all = _get(
+            session,
+            ZENODO_SEARCH,
+            params={
+                "communities": SIDDHAM_COMMUNITY,
+                "size": 1,
+                "page": 1,
+            },
+            headers=headers,
+        )
         total_all = r_all.json()["hits"]["total"]
 
-        r_kn = _get(session, ZENODO_SEARCH, params={
-            "communities": SIDDHAM_COMMUNITY,
-            "q": "Karnataka",
-            "size": 1,
-            "page": 1,
-        }, headers=headers)
+        r_kn = _get(
+            session,
+            ZENODO_SEARCH,
+            params={
+                "communities": SIDDHAM_COMMUNITY,
+                "q": "Karnataka",
+                "size": 1,
+                "page": 1,
+            },
+            headers=headers,
+        )
         total_karnataka = r_kn.json()["hits"]["total"]
 
         _save(
@@ -385,9 +402,7 @@ def probe_siddham(session: requests.Session) -> None:
 # CSV. This probe fetches only the HTTP headers to confirm the endpoint is
 # reachable and records the known total from the published export.
 
-PANDIT_EXPORT_URL = (
-    "https://panditproject.org/search/pandit-entities-export?page&_format=csv"
-)
+PANDIT_EXPORT_URL = "https://panditproject.org/search/pandit-entities-export?page&_format=csv"
 PANDIT_TOTAL_FROM_PAPER = 67529  # Pāṇḍityatāraka, WSC 2025, export dated 2024-12-23
 
 
@@ -419,6 +434,7 @@ def probe_pandit(session: requests.Session) -> None:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print(f"Probe run: {date.today().isoformat()}")
