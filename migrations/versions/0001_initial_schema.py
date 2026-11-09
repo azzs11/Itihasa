@@ -96,15 +96,9 @@ def upgrade() -> None:
         sa.Column("outcome", sa.String, nullable=False),
         sa.Column("confidence", sa.Float, nullable=True),
     )
-    op.create_index(
-        "ix_provenance_events_record_id", "provenance_events", ["record_id"]
-    )
-    op.create_index(
-        "ix_provenance_events_event_type", "provenance_events", ["event_type"]
-    )
-    op.create_index(
-        "ix_provenance_events_event_datetime", "provenance_events", ["event_datetime"]
-    )
+    op.create_index("ix_provenance_events_record_id", "provenance_events", ["record_id"])
+    op.create_index("ix_provenance_events_event_type", "provenance_events", ["event_type"])
+    op.create_index("ix_provenance_events_event_datetime", "provenance_events", ["event_datetime"])
 
     op.create_table(
         "graph_nodes",
@@ -142,12 +136,8 @@ def upgrade() -> None:
             "source_node_id", "target_node_id", "relation_type", name="uq_graph_edge"
         ),
     )
-    op.create_index(
-        "ix_graph_edges_source_node_id", "graph_edges", ["source_node_id"]
-    )
-    op.create_index(
-        "ix_graph_edges_relation_type", "graph_edges", ["relation_type"]
-    )
+    op.create_index("ix_graph_edges_source_node_id", "graph_edges", ["source_node_id"])
+    op.create_index("ix_graph_edges_relation_type", "graph_edges", ["relation_type"])
 
 
 def downgrade() -> None:
